@@ -1,0 +1,13 @@
+//NAME: Alex Guo
+//NETID: hg31
+
+General format is ./412fe [flags] filename\
+Default operation is -p\
+\
+Only accept one argument at a time
+
+Specification:\
+-h: the help option that will print available options\
+-s: prints tokens in token stream\
+-r: prints human readable version of parser IR\
+-p: invokes parser and reports on success or failure
