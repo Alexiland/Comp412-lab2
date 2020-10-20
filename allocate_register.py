@@ -31,78 +31,162 @@ class Allocator(object):
         op = self.ir.dummy_head
 
         while op is not None:
-            vr1 = op.value.value.operand1.vr
-            vr2 = op.value.value.operand2.vr
-            vr3 = op.value.value.operand3.vr
-
             # Store LOADI values for rematerialization later.
             if op.value.value.op == 'loadI':
-                self.vr_spill[vr3] = (CONSTANT, op.value.value.operand1.sr)
-                vr_nu[vr3] = op.value.value.operand3.nu
-                op = op.next
-                continue
+                vr3 = op.value.value.operand3.vr
+                # self.vr_spill[vr3] = (CONSTANT, op.value.value.operand1.sr)
+                # vr_nu[vr3] = op.value.value.operand3.nu
 
-            # Unused declaration.
-            if vr3 is not None and op.value.value.operand3.nu is None:
+
+                # vr3 corresponds to new declaration, so always needs new pr
+                if vr3 is not None:
+                    p = self.get_pr()
+                    self.assign_pr(vr3, p)
+                    op.value.value.operand3.pr = p
+
+                # Update next use of vr3
+                if vr3 is not None:
+                    if op.value.value.operand3.nu is not None:
+                        vr_nu[vr3] = op.value.value.operand3.nu
+                    else:
+                        self.clear_vr(vr3)
+
+            elif op.value.value.op == 'load':
+                vr1 = op.value.value.operand1.vr
+                vr3 = op.value.value.operand3.vr
+
                 if vr1 is not None:
-                    if op.value.value.operand2.nu is not None:
+                    if vr_to_pr[vr1] is not None:
+                        op.value.value.operand1.pr = vr_to_pr[vr1]
+                    else:
+                        p = self.unspill(vr1)
+                        op.value.value.operand1.pr = p
+                self.reserved_vr = None
+
+                if vr1 is not None:
+                    if op.value.value.operand1.nu is not None:
+                        vr_nu[vr1] = op.value.value.operand1.nu
+                    else:
+                        self.clear_vr(vr1)
+
+                # vr3 corresponds to new declaration, so always needs new pr
+                if vr3 is not None:
+                    p = self.get_pr()
+                    self.assign_pr(vr3, p)
+                    op.value.value.operand3.pr = p
+
+                # Update next use of vr3
+                if vr3 is not None:
+                    if op.value.value.operand3.nu is not None:
+                        vr_nu[vr3] = op.value.value.operand3.nu
+                    else:
+                        self.clear_vr(vr3)
+
+            elif op.value.value.op == 'store':
+                vr1 = op.value.value.operand1.vr
+                vr3 = op.value.value.operand3.vr
+
+                if vr1 is not None:
+                    if vr_to_pr[vr1] is not None:
+                        op.value.value.operand1.pr = vr_to_pr[vr1]
+                    else:
+                        # Retrieve spilled value
+                        self.reserved_vr = vr3
+                        p = self.unspill(vr1)
+                        op.value.value.operand1.pr = p
+
+                if vr3 is not None:
+                    if vr_to_pr[vr3] is not None:
+                        op.value.value.operand3.pr = vr_to_pr[vr3]
+                    else:
+                        # Retrieve spilled value
+                        self.reserved_vr = vr1
+                        p = self.unspill(vr3)
+                        op.value.value.operand3.pr = p
+
+                self.reserved_vr = None
+
+                # Update next use and clear regs if necessary. Clearing before
+                # handling r3 allows for reuse of the same registers within an expression.
+                if vr1 is not None:
+                    if op.value.value.operand1.nu is not None:
+                        vr_nu[vr1] = op.value.value.operand1.nu
+                    else:
+                        self.clear_vr(vr1)
+                if vr3 is not None:
+                    if op.value.value.operand3.nu is not None:
+                        vr_nu[vr3] = op.value.value.operand3.nu
+                    else:
+                        self.clear_vr(vr3)
+
+            elif op.value.value.op == 'add' \
+                    or op.value.value.op == 'sub' or op.value.value.op == 'mult' or \
+                    op.value.value.op == 'lshift' or op.value.value.op == 'rshift':
+                vr1 = op.value.value.operand1.vr
+                vr2 = op.value.value.operand2.vr
+                vr3 = op.value.value.operand3.vr
+
+                # Unused declaration.
+                # if vr3 is not None and op.value.value.operand3.nu is None:
+                #     if vr1 is not None:
+                #         if op.value.value.operand2.nu is not None:
+                #             vr_nu[vr1] = op.value.value.operand1.nu
+                #         else:
+                #             self.clear_vr(vr1)
+                #     if vr2 is not None:
+                #         if op.value.value.operand2.nu is not None:
+                #             vr_nu[vr2] = op.value.value.operand3.nu
+                #         else:
+                #             self.clear_vr(vr2)
+                #     op = op.next
+                #     continue
+
+                if vr1 is not None:
+                    if vr_to_pr[vr1] is not None:
+                        op.value.value.operand1.pr = vr_to_pr[vr1]
+                    else:
+                        # Retrieve spilled value
+                        self.reserved_vr = vr2
+                        p = self.unspill(vr1)
+                        op.value.value.operand1.pr = p
+
+                if vr2 is not None:
+                    if vr_to_pr[vr2] is not None:
+                        op.value.value.operand2.pr = vr_to_pr[vr2]
+                    else:
+                        # Retrieve spilled value
+                        self.reserved_vr = vr1
+                        p = self.unspill(vr2)
+                        op.value.value.operand2.pr = p
+
+                self.reserved_vr = None
+
+                # Update next use and clear regs if necessary. Clearing before
+                # handling r3 allows for reuse of the same registers within an expression.
+                if vr1 is not None:
+                    if op.value.value.operand1.nu is not None:
                         vr_nu[vr1] = op.value.value.operand1.nu
                     else:
                         self.clear_vr(vr1)
                 if vr2 is not None:
                     if op.value.value.operand2.nu is not None:
-                        vr_nu[vr2] = op.value.value.operand3.nu
+                        vr_nu[vr2] = op.value.value.operand2.nu
                     else:
                         self.clear_vr(vr2)
-                op = op.next
-                continue
 
-            if vr1 is not None:
-                if vr_to_pr[vr1] is not None:
-                    op.value.value.operand1.pr = vr_to_pr[vr1]
-                else:
-                    # Retrieve spilled value
-                    self.reserved_vr = vr2
-                    p = self.unspill(vr1)
-                    op.value.value.operand1.pr = p
+                # vr3 corresponds to new declaration, so always needs new pr
+                if vr3 is not None:
+                    p = self.get_pr()
+                    self.assign_pr(vr3, p)
 
-            if vr2 is not None:
-                if vr_to_pr[vr2] is not None:
-                    op.value.value.operand2.pr = vr_to_pr[vr2]
-                else:
-                    # Retrieve spilled value
-                    self.reserved_vr = vr1
-                    p = self.unspill(vr2)
-                    op.value.value.operand2.pr = p
+                    op.value.value.operand3.pr = p
 
-            self.reserved_vr = None
-
-            # Update next use and clear regs if necessary. Clearing before
-            # handling r3 allows for reuse of the same registers within an expression.
-            if vr1 is not None:
-                if op.value.value.operand1.nu is not None:
-                    vr_nu[vr1] = op.value.value.operand1.nu
-                else:
-                    self.clear_vr(vr1)
-            if vr2 is not None:
-                if op.value.value.operand2.nu is not None:
-                    vr_nu[vr2] = op.value.value.operand2.nu
-                else:
-                    self.clear_vr(vr2)
-
-            # vr3 corresponds to new declaration, so always needs new pr
-            if vr3 is not None:
-                p = self.get_pr()
-                self.assign_pr(vr3, p)
-
-                op.value.value.operand3.pr = p
-
-            # Update next use of vr3
-            if vr3 is not None:
-                if op.value.value.operand3.nu is not None:
-                    vr_nu[vr3] = op.value.value.operand3.nu
-                else:
-                    self.clear_vr(vr3)
+                # Update next use of vr3
+                if vr3 is not None:
+                    if op.value.value.operand3.nu is not None:
+                        vr_nu[vr3] = op.value.value.operand3.nu
+                    else:
+                        self.clear_vr(vr3)
 
             self.new_ir.add(op)
             op = op.next

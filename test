@@ -1,0 +1,6 @@
+./AllocAndRunALL 3 > AllocAndRunALL.txt \
+./AllocAndRunALL 4 >> AllocAndRunALL.txt \
+./AllocAndRunALL 5 >> AllocAndRunALL.txt \
+./AllocAndRunALL 6 >> AllocAndRunALL.txt \
+./AllocAndRunALL 8 >> AllocAndRunALL.txt \
+./AllocAndRunALL 10 >> AllocAndRunALL.txt

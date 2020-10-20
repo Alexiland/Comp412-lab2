@@ -5,7 +5,8 @@ import sys
 from scanner import *
 from parser import *
 from rename_register import *
-from allocate_register import *
+# from allocate_register import *
+from allocator import *
 
 components = {'MEMOP': ['load', 'store'],
               'LOADI': ['loadI'],
@@ -86,9 +87,10 @@ def k(k, scanner):
     result = parser.parse()
     if isinstance(result, IR) and not scanner.error_flag:
         rename_register(result)
+        # result.traverse()
         allocator = Allocator(result, k)
-        allocator.allocate_registers()
-        result.traverse()
+        new = allocator.allocate_registers()
+        new.traverse()
 
 def d(scanner):
     parser = Parser(scanner)
