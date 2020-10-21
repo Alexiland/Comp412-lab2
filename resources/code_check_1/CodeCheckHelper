@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+#  usage: AllocHelper file path
+#
+#  where  file is the path of the test file, and 
+#         path is the name of the allocator to test
+#
+#  Locations for the ILOC Simulator, the Register Allocator,
+#  and the command that actually runs the code are specified
+#  in the defined variables SIM, ALLOC, and RUN
+#
+SIM=/clear/courses/comp412/students/lab2/sim
+RUN=/clear/courses/comp412/students/lab2/code_check_1/CheckOne
+CHECKER=/clear/courses/comp412/students/lab2/code_check_1/ReportOne
+DIR=$(pwd)
+FILE=$1
+ALLOC=$2
+#
+echo "--------------------"
+#
+    echo "Checking '$FILE'"
+    echo "-----" >~/CodeCheck1.log
+    $RUN $FILE $ALLOC $SIM >>~/CodeCheck1.log
+    echo "-----" >>~/CodeCheck1.log
+    $CHECKER ~/CodeCheck1.log
+    echo "--------------------"
+#
+

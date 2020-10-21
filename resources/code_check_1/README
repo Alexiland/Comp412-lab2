@@ -1,0 +1,44 @@
+COMP 412, Fall 2015
+
+This directory contains the set of scripts, C programs, and 
+test blocks used to perform Lab 2 code check #1.
+
+To invoke code check #1, type
+
+   ~comp412/students/lab2/code_check_1/CodeCheck1  <path>
+
+where <path> is the Linux pathname for your allocator.
+
+You can copy CodeCheck1 to your own directory, or invoke it by
+giving the full Linux pathname.  All of the other tools are 
+hard coded, with full pathnames, into the scripts.
+
+You should see, as a result, a several lines of output that 
+document when the test took place, where the test took place, 
+and which allocator was tested, followed by reports on five 
+blocks named cc1.i through cc5.i. Those reports look like:
+
+--------------------
+Checking 'cc1.i'
+Program 'cc1.i'		correctly executed in 20 cycles
+
+--> Code Check: failed, with 5 reassignments.
+--------------------
+
+or
+
+--------------------
+Checking 'cc1.i'
+Program 'cc1.i'		correctly executed in 20 cycles
+
+--> Code Check: passed.
+--------------------
+
+The two critical features are the words 
+
+"correctly executed" -- means the output statements matched the 
+	   	        right answer in the comment fields at the 
+			top of the file
+
+"passed" or "failed" -- verdict on the correctness of your renaming pass.
+

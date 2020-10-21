@@ -72,7 +72,8 @@ def h():
         './412alloc [flags] filename\n\nRequired arguments: '
         '\n\tfilename is a pathname to the input file\n\nOptional flags:\n\t'
         '-h\tprint this message\n\t'
-        '-x\tperform register renaming on given input file\n\t')
+        '-x\tperform register renaming on given input file\n\t'
+        'k\tthe number k should 3 <= k <= 64\n')
 
 
 def x(scanner):

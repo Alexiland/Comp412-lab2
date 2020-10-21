@@ -1,0 +1,55 @@
+COMP 412, Fall 2016
+
+This directory contains the scripts and tools to perform lab 2
+code check 2.
+
+To invoke code check 2, type
+
+    ~comp412/students/lab2/code_check_2/CodeCheck2 <alloc path>
+
+where <alloc path> is the Linux path to your allocator. For
+example, if you ran the code check in the directory containing
+your allocator and your allocator was named "412alloc", you 
+would type 
+
+    ~comp412/students/lab2/code_check_2/CodeCheck2 ./412alloc
+
+You can copy the CodeCheck2 script to your own directory and 
+invoke it, or you can specify its full path name.  All of the
+other tools are hard coded, with full path names, into the scripts.
+
+You should see, as a result, some lines that document when and
+where the test took place, followed by reports on how your 
+allocator did on the test blocks.  The code check first tries
+your allocator with k = 7, then with k = 5.
+
+The report might look like: 
+
+--------------------------------------------------------------
+Allocating and Testing ILOC Files
+in /Users/keith/MyFiles/Src/412/2016/lab2/CC2/test
+ 
+Using allocator = /Users/keith/MyFiles/Src/412/2016/lab2/Ref/Reference/412alloc
+for k = 7
+ 
+Program 'cc1.i'		correctly executed 20 cycles
+Program 'cc2.i'		correctly executed 65 cycles
+Program 'cc3.i'		correctly executed 64 cycles
+Program 'cc4.i'		correctly executed 5544 cycles
+Program 'cc5.i'		correctly executed 144 cycles
+
+for k = 5
+ 
+Program 'cc1.i'		correctly executed 19 cycles
+Program 'cc2.i'		correctly executed 91 cycles
+Program 'cc3.i'		correctly executed 87 cycles
+Program 'cc4.i'		correctly executed 6204 cycles
+Program 'cc5.i'		correctly executed 156 cycles
+
+--------------------------------------------------------------
+
+The CodeCheck2 script leaves two files in your home directory,
+CC2a.log and CC2b.log; in the event that the CodeCheck does not
+work, those log files may provide some insight into the problem.
+
+

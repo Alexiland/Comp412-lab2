@@ -17,12 +17,14 @@ class Allocator(object):
 
         self.queue = Queue()
         if self.k < self.ir.max_live:
+            self.no_spill = False
             self.vr_to_pr = [None] * (self.ir.max_vr + 1)
             self.pr_to_vr = [None] * (self.k - 1)
             self.spill_reg = self.k - 1
             for i in range(self.k - 1):
                 self.queue.put(i)
         else:
+            self.no_spill = True
             self.spill_reg = None
             self.vr_to_pr = [None] * (self.ir.max_vr + 1)
             self.pr_to_vr = [None] * (self.k)
